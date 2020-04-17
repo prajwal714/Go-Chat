@@ -10,12 +10,10 @@ import (
 type room struct {
 	// forward channel that holds incomig msgs
 	//that should be forwarded to other clients
-
 	forward chan []byte
 
 	//join is the channel for clients wishing to
 	//join this channel
-
 	join chan *client
 
 	//leave is the channel for
