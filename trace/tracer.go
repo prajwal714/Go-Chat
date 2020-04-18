@@ -16,6 +16,15 @@ type tracer struct {
 	out io.Writer
 }
 
+type nilTracer struct {
+}
+
+func (t *nilTracer) Trace(a ...interface{}) {}
+
+func Off() Tracer {
+	return &nilTracer{}
+}
+
 //function Trace is a method of class tracer which writes a to out instance of tracer class
 func (t *tracer) Trace(a ...interface{}) {
 	fmt.Fprint(t.out, a...)
