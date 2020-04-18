@@ -11,8 +11,8 @@ func TestNew(t *testing.T) {
 	if tracer == nil {
 		t.Error("return from new should not be nil")
 	} else {
-		tracer.Trace("Hello trace package")
-		if buf.String() != "Hello trace package" {
+		tracer.Trace("Hello trace package \n")
+		if buf.String() != "Hello trace package \n" {
 			t.Errorf("Trace should not write '%s' ", buf.String())
 		}
 	}

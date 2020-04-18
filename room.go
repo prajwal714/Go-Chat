@@ -1,6 +1,7 @@
 package main
 
 import (
+	"chat/trace"
 	"log"
 	"net/http"
 
@@ -22,6 +23,9 @@ type room struct {
 
 	//clients holds all the current clients in this room
 	clients map[*client]bool
+
+	//tracer will recieve trace info of the activity in the room
+	tracer trace.Tracer
 }
 
 func (r *room) run() {
@@ -31,16 +35,20 @@ func (r *room) run() {
 		case client := <-r.join:
 			//joining clients
 			r.clients[client] = true
+			r.tracer.Trace("New Client Joined")
 
 		case client := <-r.leave:
 			//leaving the room
 			delete(r.clients, client)
 			close(client.send)
+			r.tracer.Trace("Client left")
 
 		case msg := <-r.forward:
+			r.tracer.Trace("Message recieved: ", string(msg))
 			//forward message to all clients
 			for client := range r.clients {
 				client.send <- msg
+				r.tracer.Trace(" -- sent to client")
 			}
 		}
 	}

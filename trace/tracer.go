@@ -19,7 +19,7 @@ type tracer struct {
 //function Trace is a method of class tracer which writes a to out instance of tracer class
 func (t *tracer) Trace(a ...interface{}) {
 	fmt.Fprint(t.out, a...)
-	fmt.Fprint(t.out)
+	fmt.Fprintln(t.out)
 }
 
 //Tracer here is a type of data which can have any type of value
