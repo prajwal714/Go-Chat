@@ -15,6 +15,7 @@ type templateHandler struct {
 	templ    *template.Template
 }
 
+//HTTP handler to serve templates
 func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.once.Do(func() {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
@@ -31,7 +32,7 @@ func main() {
 	r := newRoom()
 	// r.tracer = trace.New(os.Stdout)
 
-	http.Handle("/", &templateHandler{filename: "chat.html"})
+	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/room", r)
 
 	go r.run()
