@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 	"sync"
 	"text/template"
+
+	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/github"
 )
 
 type templateHandler struct {
@@ -28,6 +31,11 @@ func main() {
 
 	var addr = flag.String("addr", ":8080", "The addr of the application.")
 	flag.Parse() //parse the flags
+
+	gomniauth.SetSecurityKey("admin1234")
+	gomniauth.WithProviders(
+		github.New("22f0dcb22b1b50033d6d", "0d08156c1c332d6bda74be24803e715818de015c", "http://localhost:8080/auth/callback/github"),
+	)
 
 	r := newRoom()
 	// r.tracer = trace.New(os.Stdout)
