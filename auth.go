@@ -46,8 +46,8 @@ func MustAuth(handler http.Handler) http.Handler {
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	//we are breaking the path into segs to extract the action and provider
 	segs := strings.Split(r.URL.Path, "/")
-	action := segs[2]
-	provider := segs[3]
+	action := segs[2]   //login action
+	provider := segs[3] //login using google or Github or facebook
 
 	switch action {
 	case "login":
@@ -57,7 +57,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		loginUrl, err := provider.GetBeginAuthURL(nil, nil)
+		loginUrl, err := provider.GetBeginAuthURL(nil, nil) //Get Begin Auth URL contains the url we must redirect the user to begin logging
 
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error when trying to GetBeginAuthURL for %s:%s", provider, err), http.StatusInternalServerError)
@@ -66,29 +66,30 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Location", loginUrl)
 		w.WriteHeader(http.StatusTemporaryRedirect)
-	case "callback":
+	case "callback": //this is the callback which we will be rddirected after OAuth from provider
 		provider, err := gomniauth.Provider(provider)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error while trying to get provider %s: %s", provider, err), http.StatusBadRequest)
 			return
 		}
-
+		// we parse the Raw query and completeAuth function complete the OAuth2 provider handshake with provider
+		//creds store the credentials of the user
 		creds, err := provider.CompleteAuth(objx.MustFromURLQuery(r.URL.RawQuery))
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error while trying to complete auth for %s: %s", provider, err), http.StatusInternalServerError)
 			return
 		}
-
+		//we extract the user name from the provided creds
 		user, err := provider.GetUser(creds)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error while trying to get user %s: %s", provider, err), http.StatusInternalServerError)
 			return
 		}
-
+		// we base encode the name of user to store in our auth cookie
 		authCookieValue := objx.New(map[string]interface{}{
 			"name": user.Name(),
 		}).MustBase64()
-
+		//after setting the aut cookie we can redirect to the /chat and it will successfully pass the AuthHandler
 		http.SetCookie(w, &http.Cookie{
 			Name:  "auth",
 			Value: authCookieValue,
