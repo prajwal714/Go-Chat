@@ -1,9 +1,9 @@
 package main
 
 import (
-	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path"
 )
 
@@ -30,6 +30,12 @@ func uploaderHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	//we create a new filename using userId and existing filename from the header.Filename of file
 	filename := path.Join("avatars", userId+path.Ext(header.Filename))
+	//check if file already exists, if yes delete it and replace it
+
+	if _, err := os.Stat(userId); err == nil {
+		//file exists
+		os.Remove(filename)
+	}
 	//ioutil.WriteFile creates a new file in the avatars folder
 	//0777 gives us all file permissions
 	err = ioutil.WriteFile(filename, data, 0777)
@@ -40,5 +46,6 @@ func uploaderHandler(w http.ResponseWriter, req *http.Request) {
 
 	}
 
-	io.WriteString(w, "Successful")
+	// io.WriteString(w, "Successful")
+	http.Redirect(w, req, "/chat", 301)
 }

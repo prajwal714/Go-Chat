@@ -14,7 +14,12 @@ import (
 	"github.com/stretchr/objx"
 )
 
-var avatars Avatar = UseFileSystemAvatar
+//we add all 3 implementations of the Avatars, it implements whichever returns the Avatar URL
+var avatars Avatar = TryAvatars{
+	UseFileSystemAvatar,
+	UseAuthAvatar,
+	UseGravatar,
+}
 
 type templateHandler struct {
 	once     sync.Once
@@ -39,7 +44,9 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	t.templ.Execute(w, data)
 }
-
+func redirect(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/chat", 301)
+}
 func main() {
 
 	var addr = flag.String("addr", ":8080", "The addr of the application.")
@@ -53,6 +60,7 @@ func main() {
 	r := newRoom()
 	// r.tracer = trace.New(os.Stdout)
 
+	http.HandleFunc("/", redirect)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
 	//handles the upload form to upload a custom avatar
