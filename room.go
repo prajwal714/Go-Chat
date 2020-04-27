@@ -27,6 +27,8 @@ type room struct {
 
 	//tracer will recieve trace info of the activity in the room
 	tracer trace.Tracer
+	//avatar is how avatar info will be obtained
+	avatar Avatar
 }
 
 func (r *room) run() {
