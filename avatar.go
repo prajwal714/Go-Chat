@@ -1,11 +1,7 @@
 package main
 
 import (
-	"crypto/md5"
 	"errors"
-	"fmt"
-	"io"
-	"strings"
 )
 
 //ErrNoAvatarURL is returned when the avatar instace is unable to provide an avatar from the url
@@ -37,13 +33,12 @@ type GravatarAvatar struct {
 var UseGravatar GravatarAvatar
 
 func (GravatarAvatar) GetAvatarURL(c *client) (string, error) {
-	if email, ok := c.userData["email"]; ok {
+	if userid, ok := c.userData["userid"]; ok {
 		//we extract the email field fromt the stored cookie of the user
-		if emailStr, ok := email.(string); ok {
-			// we hash the email using MD5 algo and append it to the gravatar url address
-			m := md5.New()
-			io.WriteString(m, strings.ToLower(emailStr))
-			return fmt.Sprintf("//www.gravatar.com/avatar/%x", m.Sum(nil)), nil
+		if useridStr, ok := userid.(string); ok {
+			// we use the hash of the email userid in out gravatar url
+
+			return "//www.gravatar.com/avatar/" + useridStr, nil
 		}
 	}
 	return "", ErrNoAvatarURL
