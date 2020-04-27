@@ -8,56 +8,81 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	gomniauthtest "github.com/stretchr/gomniauth/test"
 )
 
+// func TestAuthAvatar(t *testing.T) {
+// 	var authAvatar AuthAvatar
+
+// 	//creating an empty client
+// 	client := new(client)
+
+// 	//fetching url from empty client returns err
+// 	url, err := authAvatar.GetAvatarURL(client)
+
+// 	//we check if err == ErrNoAvatarURL, since it should be returned
+// 	if err != ErrNoAvatarURL {
+// 		t.Error("AuthAVatar.GetAvatarURL should return ErrNoAvatarURL when no value present")
+// 	}
+// 	//now we set our testURL to client avatar_url
+// 	//set a vlaue
+// 	testURL := "http://url-to-gravatar/"
+// 	//we insert in the client userdata map
+// 	client.userData = map[string]interface{}{
+// 		"avatar_url": testURL,
+// 	}
+
+// 	//now we check for error again, since now the url of avatar is not empty
+// 	url, err = authAvatar.GetAvatarURL(client)
+
+// 	//this time err returned will not be empty
+// 	if err != nil {
+// 		t.Error("AuthAvatar.GetAVatarURL should return no error when value present")
+// 	}
+
+// 	if url != testURL {
+// 		t.Error("AuthAvatar.GetAvatarURL should return correct URL")
+// 	}
+
+// }
 func TestAuthAvatar(t *testing.T) {
 	var authAvatar AuthAvatar
+	testUser := &gomniauthtest.TestUser{}
+	testUser.On("AvatarURL").Return("", ErrNoAvatarURL)
+	testChatUser := &chatUser{User: testUser}
+	url, err := authAvatar.GetAvatarURL(testChatUser)
 
-	//creating an empty client
-	client := new(client)
-
-	//fetching url from empty client returns err
-	url, err := authAvatar.GetAvatarURL(client)
-
-	//we check if err == ErrNoAvatarURL, since it should be returned
 	if err != ErrNoAvatarURL {
-		t.Error("AuthAVatar.GetAvatarURL should return ErrNoAvatarURL when no value present")
-	}
-	//now we set our testURL to client avatar_url
-	//set a vlaue
-	testURL := "http://url-to-gravatar/"
-	//we insert in the client userdata map
-	client.userData = map[string]interface{}{
-		"avatar_url": testURL,
+		t.Error("AuthAvatar.GetAvatarURL should return ErrNoAvatarURLwhen no value present")
 	}
 
-	//now we check for error again, since now the url of avatar is not empty
-	url, err = authAvatar.GetAvatarURL(client)
+	testUrl := "http://url-to-gravatar/"
+	testUser = &gomniauthtest.TestUser{}
+	testChatUser.User = testUser
+	testUser.On("AvatarURL").Return(testUrl, nil)
 
-	//this time err returned will not be empty
+	url, err = authAvatar.GetAvatarURL(testChatUser)
 	if err != nil {
-		t.Error("AuthAvatar.GetAVatarURL should return no error when value present")
+		t.Error("AuthAvatar.GetAvatarURL should return no errorwhen value present")
 	}
-
-	if url != testURL {
+	if url != testUrl {
 		t.Error("AuthAvatar.GetAvatarURL should return correct URL")
 	}
-
 }
 
 //this is the test code for gravatar same as test code for auth avatar
 func TestGravatarAvatar(t *testing.T) {
 	var gravatarAvatar GravatarAvatar
-	client := new(client)
+	user := &chatUser{uniqueID: "abc"}
 
-	client.userData = map[string]interface{}{"userid": "0bc83cb571cd1c50ba6f3e8a78ef1346"}
-	url, err := gravatarAvatar.GetAvatarURL(client)
+	url, err := gravatarAvatar.GetAvatarURL(user)
 
 	if err != nil {
 		t.Error("GravatarAVatar.GetAvatarURL should not return error")
 	}
 
-	if url != "//www.gravatar.com/avatar/0bc83cb571cd1c50ba6f3e8a78ef1346" {
+	if url != "//www.gravatar.com/avatar/abc" {
 		t.Errorf("GravatarAvatar.GetAvatarURL wrongly returned %s", url)
 	}
 }
@@ -69,13 +94,10 @@ func TestFileSystemAvatar(t *testing.T) {
 	defer os.Remove(filename)
 
 	var fileSystemAvatar FileSystemAvatar
-	client := new(client)
 
-	client.userData = map[string]interface{}{
-		"userid": "abc",
-	}
+	user := &chatUser{uniqueID: "abc"}
 
-	url, err := fileSystemAvatar.GetAvatarURL(client)
+	url, err := fileSystemAvatar.GetAvatarURL(user)
 	if err != nil {
 		t.Error("FileSystemAvatar.GetAvatarURL should not return error")
 	}

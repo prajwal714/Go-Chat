@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 
@@ -87,15 +88,22 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, fmt.Sprintf("Error while trying to get user %s: %s", provider, err), http.StatusInternalServerError)
 			return
 		}
+		chatUser := &chatUser{User: user}
 		//we use hash value of user email as our user ID
 		m := md5.New()
 		io.WriteString(m, strings.ToLower(user.Email()))
-		userId := fmt.Sprintf("%x", m.Sum(nil))
+		chatUser.uniqueID = fmt.Sprintf("%x", m.Sum(nil))
+
+		avatarURL, err := avatars.GetAvatarURL(chatUser)
+		if err != nil {
+			log.Fatalln("Error while trying to get AvatarURL", "-", err)
+		}
+
 		// we base encode the name of user to store in our auth cookie
 		authCookieValue := objx.New(map[string]interface{}{
-			"userid":     userId,
+			"userid":     chatUser.uniqueID,
 			"name":       user.Name(),
-			"avatar_url": user.AvatarURL(),
+			"avatar_url": avatarURL,
 			"email":      user.Email(),
 		}).MustBase64()
 		//after setting the aut cookie we can redirect to the /chat and it will successfully pass the AuthHandler

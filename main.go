@@ -1,5 +1,6 @@
 package main
 
+//set the active Avatar implementation
 import (
 	"flag"
 	"log"
@@ -12,6 +13,8 @@ import (
 	"github.com/stretchr/gomniauth/providers/github"
 	"github.com/stretchr/objx"
 )
+
+var avatars Avatar = UseFileSystemAvatar
 
 type templateHandler struct {
 	once     sync.Once
@@ -47,7 +50,7 @@ func main() {
 		github.New("22f0dcb22b1b50033d6d", "0d08156c1c332d6bda74be24803e715818de015c", "http://localhost:8080/auth/callback/github"),
 	)
 
-	r := newRoom(UseFileSystemAvatar)
+	r := newRoom()
 	// r.tracer = trace.New(os.Stdout)
 
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
