@@ -15,9 +15,9 @@ type authHandler struct {
 
 func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	// _ is used to collect cookie, we discardd it coz we are only interested if it is presnt or not.
-	_, err := r.Cookie("auth")
-	if err == http.ErrNoCookie {
+	// cookie is used to collect cookie, we  candiscardd it if are only interested if it is presnt or not.
+	cookie, err := r.Cookie("auth")
+	if err == http.ErrNoCookie || cookie.Value == "" {
 		//not authenticated
 		w.Header().Set("Location", "/login")
 		w.WriteHeader(http.StatusTemporaryRedirect)
@@ -87,7 +87,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// we base encode the name of user to store in our auth cookie
 		authCookieValue := objx.New(map[string]interface{}{
-			"name": user.Name(),
+			"name":       user.Name(),
+			"avatar_url": user.AvatarURL(),
 		}).MustBase64()
 		//after setting the aut cookie we can redirect to the /chat and it will successfully pass the AuthHandler
 		http.SetCookie(w, &http.Cookie{
