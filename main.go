@@ -5,10 +5,12 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sync"
 	"text/template"
 
+	"github.com/joho/godotenv"
 	"github.com/stretchr/gomniauth"
 	"github.com/stretchr/gomniauth/providers/github"
 	"github.com/stretchr/objx"
@@ -18,13 +20,25 @@ import (
 var avatars Avatar = TryAvatars{
 	UseFileSystemAvatar,
 	UseAuthAvatar,
-	UseGravatar,
+	// UseGravatar,
 }
 
 type templateHandler struct {
 	once     sync.Once
 	filename string
 	templ    *template.Template
+}
+
+func goDotEnvVariable(key string) string {
+
+	// load .env file
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	return os.Getenv(key)
 }
 
 //HTTP handler to serve templates
@@ -49,12 +63,16 @@ func redirect(w http.ResponseWriter, r *http.Request) {
 }
 func main() {
 
+	godotenv.Load(".env")
+
 	var addr = flag.String("addr", ":8080", "The addr of the application.")
 	flag.Parse() //parse the flags
-
+	ClientID := goDotEnvVariable("GITHUB_CLIENT_ID")
+	ClientSecret := goDotEnvVariable("GITHUB_CLIENT_SECRET")
+	log.Printf("Cllient ID %s, Client secret: %s", ClientID, ClientSecret)
 	gomniauth.SetSecurityKey("admin1234")
 	gomniauth.WithProviders(
-		github.New("22f0dcb22b1b50033d6d", "0d08156c1c332d6bda74be24803e715818de015c", "http://localhost:8080/auth/callback/github"),
+		github.New(ClientID, ClientSecret, "http://localhost:8080/auth/callback/github"),
 	)
 
 	r := newRoom()
