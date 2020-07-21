@@ -46,7 +46,7 @@
                 </label> or <a href="/logout">Sign out</a>
                 <textarea id="message" class="form-control"></textarea>
             </div>
-            <input type="submit" value="Send" class="btn btn-success" />
+            <input id="send" type="submit" value="Send" class="btn btn-success" />
         </form>
     </div>
 
@@ -54,12 +54,28 @@
     <!-- Script for chatting options  -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
+
+
         $(function () {
-            var socket = null;
+
+            let shiftDown = false;
+            let socket = null;
             var msgBox = $("#chatbox textarea");
             var messages = $("#messages");
+            var chatForm = $("#chatBox");
 
-            $("#chatbox").submit(function () {
+            $("#chatbox").keypress(function (e) {
+
+
+                if (e.keyCode == 13) {
+                    if (msgBox.is(":focus") && !shiftDown) {
+                        e.preventDefault(); // prevent another \n from being entered
+                        submit();
+                    }
+                }
+            });
+
+            function submit() {
                 if (!msgBox.val()) return false;
                 if (!socket) {
                     alert("Error: Their is no socket connection");
@@ -69,7 +85,7 @@
                 socket.send(JSON.stringify({ "Message": msgBox.val() }));
                 msgBox.val("");
                 return false;
-            });
+            };
 
             if (!window["WebSocket"]) {
                 alert("Error: Your browser dosent support web sockets")
@@ -94,6 +110,14 @@
                     );
                 }
             }
+
+            $("#chatbox").keydown(function (e) {
+                if (e.keyCode == 16) shiftDown = true;
+            });
+
+            $("#chatbox").keyup(function (e) {
+                if (e.keyCode == 16) shiftDown = false;
+            });
         }
         )
 

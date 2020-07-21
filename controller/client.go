@@ -1,32 +1,33 @@
-package main
+package controller
 
 import (
+	"Go-Chat/go.mod/contracts"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
 // client represents a single chatting user.
-type client struct {
+type Client struct {
 
 	// socket is the web socket for this client.
 	socket *websocket.Conn
 
 	// send is a channel on which messages are sent.
-	send chan *message
+	send chan *contracts.Message
 
 	// room is the room this client is chatting in.
-	room *room
+	room *Room
 
 	//stores info about the user
 	userData map[string]interface{}
 }
 
-func (c *client) read() {
+func (c *Client) read() {
 	defer c.socket.Close()
 
 	for {
-		var msg *message
+		var msg *contracts.Message
 		err := c.socket.ReadJSON(&msg)
 		if err != nil {
 			return
@@ -44,7 +45,7 @@ func (c *client) read() {
 
 }
 
-func (c *client) write() {
+func (c *Client) write() {
 	defer c.socket.Close()
 
 	for msg := range c.send {

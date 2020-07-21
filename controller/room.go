@@ -1,35 +1,37 @@
-package main
+package controller
 
 import (
-	"chat/trace"
 	"log"
 	"net/http"
+
+	"Go-Chat/go.mod/contracts"
+	"Go-Chat/go.mod/trace"
 
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/objx"
 )
 
-type room struct {
+type Room struct {
 	// forward channel that holds incomig msgs
 	//that should be forwarded to other clients
-	forward chan *message
+	forward chan *contracts.Message
 
 	//join is the channel for clients wishing to
 	//join this channel
-	join chan *client
+	join chan *Client
 
 	//leave is the channel for
 	// clients wishing to leave the room
-	leave chan *client
+	leave chan *Client
 
 	//clients holds all the current clients in this room
-	clients map[*client]bool
+	clients map[*Client]bool
 
 	//tracer will recieve trace info of the activity in the room
 	tracer trace.Tracer
 }
 
-func (r *room) run() {
+func (r *Room) Run() {
 	for {
 		select {
 
@@ -62,7 +64,7 @@ const (
 
 var upgrader = &websocket.Upgrader{ReadBufferSize: socketBufferSize, WriteBufferSize: socketBufferSize}
 
-func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (r *Room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	socket, err := upgrader.Upgrade(w, req, nil)
 	if err != nil {
 		log.Fatal("ServeHTTP: ", err)
@@ -75,9 +77,9 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	client := &client{
+	client := &Client{
 		socket:   socket,
-		send:     make(chan *message, messageBufferSize),
+		send:     make(chan *contracts.Message, messageBufferSize),
 		room:     r,
 		userData: objx.MustFromBase64(authCookie.Value),
 	}
@@ -92,12 +94,12 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 //new room makes a new room that is ready to go
-func newRoom() *room {
-	return &room{
-		forward: make(chan *message),
-		join:    make(chan *client),
-		leave:   make(chan *client),
-		clients: make(map[*client]bool),
+func NewRoom() *Room {
+	return &Room{
+		forward: make(chan *contracts.Message),
+		join:    make(chan *Client),
+		leave:   make(chan *Client),
+		clients: make(map[*Client]bool),
 		tracer:  trace.Off(),
 	}
 }

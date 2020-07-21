@@ -1,4 +1,4 @@
-package main
+package controller
 
 import (
 	"io/ioutil"
@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-func uploaderHandler(w http.ResponseWriter, req *http.Request) {
+func UploaderHandler(w http.ResponseWriter, req *http.Request) {
 
 	//we first extract the form fields from the req object
 	userId := req.FormValue("userid")

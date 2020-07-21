@@ -1,4 +1,4 @@
-package main
+package controller
 
 import (
 	"crypto/md5"
@@ -9,11 +9,21 @@ import (
 	"strings"
 
 	"github.com/stretchr/gomniauth"
+	gomniauthcommon "github.com/stretchr/gomniauth/common"
 	"github.com/stretchr/objx"
 )
 
 type authHandler struct {
 	next http.Handler
+}
+
+type chatUser struct {
+	gomniauthcommon.User
+	uniqueID string
+}
+
+func (u chatUser) UniqueID() string {
+	return u.uniqueID
 }
 
 func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +56,7 @@ func MustAuth(handler http.Handler) http.Handler {
 
 //login Handler handles third-party login process.
 //format: /auth/{action}/{provider}
-func loginHandler(w http.ResponseWriter, r *http.Request) {
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	//we are breaking the path into segs to extract the action and provider
 	segs := strings.Split(r.URL.Path, "/")
 	action := segs[2]   //login action

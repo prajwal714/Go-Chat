@@ -1,4 +1,4 @@
-package main
+package controller
 
 //this is the test file for avatar.go , here we are creating an empty client with no avatar URL
 

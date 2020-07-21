@@ -1,5 +1,5 @@
 # Binaries for programs and plugins
-chat
+
 *.o
 *.exe
 *.exe~
@@ -17,3 +17,7 @@ avatars/
 # Dependency directories (remove the comment below to include it)
 # vendor/
 .env
+*.yaml
+/out/
+vendor/
+application.yaml
