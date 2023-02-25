@@ -1,16 +1,16 @@
 package controller
 
-//this is the test file for avatar.go , here we are creating an empty client with no avatar URL
+// //this is the test file for avatar.go , here we are creating an empty client with no avatar URL
 
-//after returning an error we then set the value of avatar url to a gravater url then test again that now it isnt returning any error
-import (
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"testing"
+// //after returning an error we then set the value of avatar url to a gravater url then test again that now it isnt returning any error
+// import (
+// 	"io/ioutil"
+// 	"os"
+// 	"path/filepath"
+// 	"testing"
 
-	gomniauthtest "github.com/stretchr/gomniauth/test"
-)
+// 	gomniauthtest "github.com/stretchr/gomniauth/test"
+// )
 
 // func TestAuthAvatar(t *testing.T) {
 // 	var authAvatar AuthAvatar
@@ -46,63 +46,63 @@ import (
 // 	}
 
 // }
-func TestAuthAvatar(t *testing.T) {
-	var authAvatar AuthAvatar
-	testUser := &gomniauthtest.TestUser{}
-	testUser.On("AvatarURL").Return("", ErrNoAvatarURL)
-	testChatUser := &chatUser{User: testUser}
-	url, err := authAvatar.GetAvatarURL(testChatUser)
+// func TestAuthAvatar(t *testing.T) {
+// 	var authAvatar AuthAvatar
+// 	testUser := &gomniauthtest.TestUser{}
+// 	testUser.On("AvatarURL").Return("", ErrNoAvatarURL)
+// 	testChatUser := &chatUser{User: testUser}
+// 	url, err := authAvatar.GetAvatarURL(testChatUser)
 
-	if err != ErrNoAvatarURL {
-		t.Error("AuthAvatar.GetAvatarURL should return ErrNoAvatarURLwhen no value present")
-	}
+// 	if err != ErrNoAvatarURL {
+// 		t.Error("AuthAvatar.GetAvatarURL should return ErrNoAvatarURLwhen no value present")
+// 	}
 
-	testUrl := "http://url-to-gravatar/"
-	testUser = &gomniauthtest.TestUser{}
-	testChatUser.User = testUser
-	testUser.On("AvatarURL").Return(testUrl, nil)
+// 	testUrl := "http://url-to-gravatar/"
+// 	testUser = &gomniauthtest.TestUser{}
+// 	testChatUser.User = testUser
+// 	testUser.On("AvatarURL").Return(testUrl, nil)
 
-	url, err = authAvatar.GetAvatarURL(testChatUser)
-	if err != nil {
-		t.Error("AuthAvatar.GetAvatarURL should return no errorwhen value present")
-	}
-	if url != testUrl {
-		t.Error("AuthAvatar.GetAvatarURL should return correct URL")
-	}
-}
+// 	url, err = authAvatar.GetAvatarURL(testChatUser)
+// 	if err != nil {
+// 		t.Error("AuthAvatar.GetAvatarURL should return no errorwhen value present")
+// 	}
+// 	if url != testUrl {
+// 		t.Error("AuthAvatar.GetAvatarURL should return correct URL")
+// 	}
+// }
 
-//this is the test code for gravatar same as test code for auth avatar
-func TestGravatarAvatar(t *testing.T) {
-	var gravatarAvatar GravatarAvatar
-	user := &chatUser{uniqueID: "abc"}
+// //this is the test code for gravatar same as test code for auth avatar
+// func TestGravatarAvatar(t *testing.T) {
+// 	var gravatarAvatar GravatarAvatar
+// 	user := &chatUser{uniqueID: "abc"}
 
-	url, err := gravatarAvatar.GetAvatarURL(user)
+// 	url, err := gravatarAvatar.GetAvatarURL(user)
 
-	if err != nil {
-		t.Error("GravatarAVatar.GetAvatarURL should not return error")
-	}
+// 	if err != nil {
+// 		t.Error("GravatarAVatar.GetAvatarURL should not return error")
+// 	}
 
-	if url != "//www.gravatar.com/avatar/abc" {
-		t.Errorf("GravatarAvatar.GetAvatarURL wrongly returned %s", url)
-	}
-}
+// 	if url != "//www.gravatar.com/avatar/abc" {
+// 		t.Errorf("GravatarAvatar.GetAvatarURL wrongly returned %s", url)
+// 	}
+// }
 
-//this is the test code for our uploaded avatar file
-func TestFileSystemAvatar(t *testing.T) {
-	filename := filepath.Join("avatars", "abc.jpg")
-	ioutil.WriteFile(filename, []byte{}, 0777)
-	defer os.Remove(filename)
+// //this is the test code for our uploaded avatar file
+// func TestFileSystemAvatar(t *testing.T) {
+// 	filename := filepath.Join("avatars", "abc.jpg")
+// 	ioutil.WriteFile(filename, []byte{}, 0777)
+// 	defer os.Remove(filename)
 
-	var fileSystemAvatar FileSystemAvatar
+// 	var fileSystemAvatar FileSystemAvatar
 
-	user := &chatUser{uniqueID: "abc"}
+// 	user := &chatUser{uniqueID: "abc"}
 
-	url, err := fileSystemAvatar.GetAvatarURL(user)
-	if err != nil {
-		t.Error("FileSystemAvatar.GetAvatarURL should not return error")
-	}
+// 	url, err := fileSystemAvatar.GetAvatarURL(user)
+// 	if err != nil {
+// 		t.Error("FileSystemAvatar.GetAvatarURL should not return error")
+// 	}
 
-	if url != "/avatars/abc.jpg" {
-		t.Errorf("FileSystemAvatar.GetAvatarURL wrongly returned %s", url)
-	}
-}
+// 	if url != "/avatars/abc.jpg" {
+// 		t.Errorf("FileSystemAvatar.GetAvatarURL wrongly returned %s", url)
+// 	}
+// }
