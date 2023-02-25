@@ -19,7 +19,7 @@ func Load() {
 	viper.AddConfigPath("./")
 	viper.AddConfigPath("../")
 
-	viper.SetConfigType("yaml")
+	viper.SetConfigType("yml")
 
 	viper.ReadInConfig()
 

@@ -23,3 +23,6 @@ compile:
 	go build -o $(APP_EXECUTABLE)
 
 build: fmt vet lint compile
+
+copy-config: 
+	cp application.sample.yml application.yml    

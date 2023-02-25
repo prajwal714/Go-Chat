@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"Go-Chat/go.mod/contracts"
-	"Go-Chat/go.mod/trace"
+	// "Go-Chat/go.mod/trace"
 
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/objx"
@@ -28,7 +28,7 @@ type Room struct {
 	clients map[*Client]bool
 
 	//tracer will recieve trace info of the activity in the room
-	tracer trace.Tracer
+	// tracer trace.Tracer
 }
 
 func (r *Room) Run() {
@@ -38,20 +38,20 @@ func (r *Room) Run() {
 		case client := <-r.join:
 			//joining clients
 			r.clients[client] = true
-			r.tracer.Trace("New Client Joined")
+			log.Println("New Client Joined")
 
 		case client := <-r.leave:
 			//leaving the room
 			delete(r.clients, client)
 			close(client.send)
-			r.tracer.Trace("Client left")
+			log.Println("Leave Client left")
 
 		case msg := <-r.forward:
-			r.tracer.Trace("Message recieved: ", msg.Message)
+			log.Println("Message recieved: ", msg.Message)
 			//forward message to all clients
 			for client := range r.clients {
 				client.send <- msg
-				r.tracer.Trace(" -- sent to client")
+				log.Println(" -- sent to client")
 			}
 		}
 	}
@@ -100,6 +100,5 @@ func NewRoom() *Room {
 		join:    make(chan *Client),
 		leave:   make(chan *Client),
 		clients: make(map[*Client]bool),
-		tracer:  trace.Off(),
 	}
 }
