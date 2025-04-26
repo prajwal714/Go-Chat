@@ -63,7 +63,7 @@
         let socket = null;
         var msgBox = $("#chatbox textarea");
         var messages = $("#messages");
-        var chatForm = $("#chatBox");
+        var chatForm = $("#chatbox");
         var sendButton = $("#send");
 
         $("#chatbox").keypress(function (e) {
@@ -95,7 +95,9 @@
         if (!window["WebSocket"]) {
           alert("Error: Your browser dosent support web sockets");
         } else {
-          socket = new WebSocket("ws://{{.Host}}/room");
+          const protocol =
+            window.location.protocol === "https:" ? "wss://" : "ws://";
+          socket = new WebSocket(protocol + "{{.Host}}/room");
           socket.onclose = function () {
             alert("Connection has been closed");
           };
