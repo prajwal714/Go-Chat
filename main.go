@@ -3,10 +3,11 @@ package main
 //set the active Avatar implementation
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
-	"strconv"
 	"sync"
 	"text/template"
 
@@ -25,7 +26,7 @@ type templateHandler struct {
 	templ    *template.Template
 }
 
-//HTTP handler to serve templates
+// HTTP handler to serve templates
 func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.once.Do(func() {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
@@ -89,7 +90,13 @@ func main() {
 	go r.Run()
 
 	//start the web server
-	portInfo := ":" + strconv.Itoa(config.Port())
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = fmt.Sprintf("%d", config.Port()) // Default port if not specified
+	}
+
+	portInfo := ":" + port
 	log.Println("Starting the web server at: ", portInfo)
 	if err := http.ListenAndServe(portInfo, nil); err != nil {
 		log.Fatal("Listen And serve: ", err)
